@@ -7,19 +7,23 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node ./dist/server.js",
-    "build": "rimraf ./dist && tsc && tsc-alias"
+    "build": "rimraf ./dist && tsc && tsc-alias",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.10.5",
+    "drizzle-kit": "^0.24.2",
     "rimraf": "^5.0.5",
     "tsc-alias": "^1.8.8",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-
+    "better-sqlite3": "^11.3.0",
+    "drizzle-orm": "^0.33.0"
   }
 }
