@@ -1,11 +1,13 @@
 {
-  "name": "js-bot",
+  "name": "typescript-esm-tsx-starter",
   "type": "module",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
+    "dev": "tsx watch src/server.ts",
+    "start": "node ./dist/server.js",
+    "build": "rimraf ./dist && tsc && tsc-alias",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
@@ -14,9 +16,13 @@
   "license": "ISC",
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
-    "@types/node": "^22.7.1",
+    "@types/node": "^20.10.5",
     "@types/node-telegram-bot-api": "^0.64.7",
-    "drizzle-kit": "^0.24.2"
+    "drizzle-kit": "^0.24.2",
+    "rimraf": "^5.0.5",
+    "tsc-alias": "^1.8.8",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "better-sqlite3": "^11.3.0",
