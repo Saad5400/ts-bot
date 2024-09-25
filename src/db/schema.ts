@@ -15,6 +15,8 @@ export const transactions = sqliteTable('transactions', {
     id: integer('id').primaryKey({autoIncrement: true}),
     accountId: integer('account').notNull().references(() => accounts.id),
     amount: integer('amount').notNull(),
+    description: text('description'),
+    category: text('category').notNull(),
     date: text('date').notNull(),
 });
 
