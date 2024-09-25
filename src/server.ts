@@ -41,16 +41,31 @@ bot.onText(/\/create_account (.+)/, async (msg, match) => {
 bot.onText(/\/list_accounts/, async (msg) => {
     const userAccounts = await db.query.accounts.findMany({
         where: (account) => eq(account.userId, msg.from!.id),
+        with: {
+            transactions: true,
+        }
     })
 
-    const accountNames = userAccounts.map(account =>
-        `${account.id}: ${account.name}`
-    ).join('\n');
+    const accountsList = userAccounts.map(function (account) {
+        // calculate total income and expenses for the past month
+        const now = new Date();
+        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        const transactions = account.transactions.filter(transaction => new Date(transaction.date) >= monthAgo);
+        const totalIncome = transactions.filter(transaction => transaction.amount > 0).reduce((total, transaction) => total + transaction.amount, 0);
+        const totalExpenses = transactions.filter(transaction => transaction.amount < 0).reduce((total, transaction) => total + transaction.amount, 0);
+        const currentBalance = account.transactions.reduce((total, transaction) => total + transaction.amount, 0);
 
-    if (accountNames) {
-        await bot.sendMessage(msg.chat.id, accountNames);
+        return `${account.name}
+الرصيد الحالي: ${currentBalance}
+الإيرادات الشهرية: ${totalIncome}
+المصاريف الشهرية: ${totalExpenses}
+`;
+    }).join('\n');
+
+    if (accountsList) {
+        await bot.sendMessage(msg.chat.id, accountsList);
     } else {
-        await bot.sendMessage(msg.chat.id, 'ليس لديك أي حسابات');
+        await bot.sendMessage(msg.chat.id, 'ليس لديك حسابات');
     }
 });
 
@@ -78,7 +93,7 @@ bot.onText(/\/delete_account (.+)/, async (msg, match) => {
 bot.onText(/\/add_transaction$/, async (msg) => {
     await bot.sendMessage(msg.chat.id, 'خطأ: يجب إدخال التصنيف والمبلغ والوصف بعد الأمر');
 });
-bot.onText(/\/add_transaction (.+?) (\d+) (.*)/, async (msg, match) => {
+bot.onText(/\/add_transaction (.+?) (-?\d+)/, async (msg, match) => {
     const category = match![1]!;
     const amount = parseInt(match![2]!);
     const description = match![3];
@@ -131,18 +146,19 @@ bot.onText(/\/add_transaction (.+?) (\d+) (.*)/, async (msg, match) => {
 bot.onText(/\/list_transactions/, async (msg) => {
     const userAccounts = await db.query.accounts.findMany({
         where: (account) => eq(account.userId, msg.from!.id),
+        with: {
+            transactions: true,
+        }
     });
     if (userAccounts.length === 0) {
         await bot.sendMessage(msg.chat.id, 'خطأ: ليس لديك حسابات');
         return;
     }
 
-    const userTransactions = await db.query.transactions.findMany({
-        where: (transaction) => eq(transaction.accountId, userAccounts[0]!.id),
-    });
-
-    const transactionsList = userTransactions.map(transaction =>
-        `${transaction.id}: ${transaction.amount} ${transaction.category} - ${transaction.description}`
+    const transactionsList = userAccounts.flatMap(account =>
+        account.transactions.map(transaction =>
+            `${transaction.id}: ${transaction.amount} ${transaction.category} ${transaction.description ? transaction.description : ''}`
+        )
     ).join('\n');
 
     if (transactionsList) {
@@ -160,17 +176,16 @@ bot.onText(/\/delete_transaction (\d+)/, async (msg, match) => {
 
     const userAccounts = await db.query.accounts.findMany({
         where: (account) => eq(account.userId, msg.from!.id),
+        with: {
+            transactions: true,
+        }
     });
     if (userAccounts.length === 0) {
         await bot.sendMessage(msg.chat.id, 'خطأ: ليس لديك حسابات');
         return;
     }
 
-    const userTransactions = await db.query.transactions.findMany({
-        where: (transaction) => eq(transaction.accountId, userAccounts[0]!.id),
-    });
-    const transactionToDelete = userTransactions.find(transaction => transaction.id === transactionId);
-
+    const transactionToDelete = userAccounts[0]!.transactions.find(transaction => transaction.id === transactionId);
     if (!transactionToDelete) {
         await bot.sendMessage(msg.chat.id, 'خطأ: العملية غير موجودة');
         return;
