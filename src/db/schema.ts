@@ -13,7 +13,9 @@ export const accountsRelations = relations(accounts, ({one, many}) => ({
 
 export const transactions = sqliteTable('transactions', {
     id: integer('id').primaryKey({autoIncrement: true}),
-    accountId: integer('account').notNull().references(() => accounts.id),
+    accountId: integer('account').notNull().references(() => accounts.id, {
+        onDelete: "cascade",
+    }),
     amount: integer('amount').notNull(),
     description: text('description'),
     category: text('category').notNull(),

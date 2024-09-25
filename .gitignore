@@ -1,6 +1,5 @@
 .idea
 db.sqlite
-src/db/migrations
 
 # Logs
 logs
