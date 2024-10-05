@@ -1,16 +1,20 @@
 ## Quick Start
 
-### 1. Clone repo
+### 1. Download
 
-download the project
+download and extract the project: https://github.com/Saad5400/ts-bot/archive/refs/heads/master.zip
 
-### 2. Install dependencies
+### 2. Open in vscode
+
+From the top-left menu of vscode, click on file > Open folder, then choose the extracted folder which contains the project.
+
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Run the development server
+### 4. Run the development server
 
 ```bash
 npm run dev
