@@ -9,7 +9,8 @@
     "start": "node ./dist/server.js",
     "build": "rimraf ./dist && tsc && tsc-alias",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "keywords": [],
   "author": "",
